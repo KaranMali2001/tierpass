@@ -1,4 +1,5 @@
 import ProfilePage from '@/components/profileComponents/ProfilePage';
+import ErrorPage from '@/components/ui/errorPage';
 import { SerializableUser } from '@/types/user-type';
 import { ClerkClient } from '@/utils/clerkClient';
 import { supabase } from '@/utils/supabase';
@@ -18,8 +19,7 @@ export default async function Profile() {
   const events = await supabase.from('events').select('*');
 
   if (events.error) {
-    console.log('error', events.error);
-    return redirect('/sign-in');
+    return <ErrorPage />;
   }
   const accessibleEvent = events.data.filter((event) => event.tier === user.publicMetadata.tier);
   const restricted_event = events.data.filter((event) => event.tier !== user.publicMetadata.tier);
@@ -37,11 +37,14 @@ export default async function Profile() {
     })),
     publicMetadata: user.publicMetadata || {},
   };
-  console.log('restricted_event', restricted_event);
-  console.log('accessibleEvent', accessibleEvent);
+
   return (
     <div>
-      <ProfilePage user={serializedUser} accessibleEvent={accessibleEvent} restricted_event={restricted_event} />
+      <ProfilePage
+        user={serializedUser}
+        accessibleEvent={accessibleEvent}
+        restricted_event={restricted_event}
+      />
     </div>
   );
 }

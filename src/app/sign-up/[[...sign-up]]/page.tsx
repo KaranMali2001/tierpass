@@ -48,17 +48,6 @@ export default function SignUpComponent() {
     router.back();
   };
 
-  // const getPasswordStrength = (password: string): number => {
-  //   let strength = 0;
-  //   if (password.length > 8) strength += 25;
-  //   if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength += 25;
-  //   if (password.match(/\d/)) strength += 25;
-  //   if (password.match(/[^a-zA-Z\d]/)) strength += 25;
-  //   return strength;
-  // };
-
-  // const passwordStrength = getPasswordStrength(password);
-
   if (verifying) {
     return <OtpComponent strategy="password" />;
   }

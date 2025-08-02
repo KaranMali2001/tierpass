@@ -11,6 +11,7 @@ import { SerializableUser } from '@/types/user-type';
 
 import { Tier } from '@/types/tier-types';
 import { AlertCircle, Calendar, CheckCircle, Crown, Loader2, Mail, User } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function ProfilePage({
@@ -22,6 +23,7 @@ export default function ProfilePage({
   accessibleEvent: eventType[];
   restricted_event: eventType[];
 }) {
+  const router = useRouter();
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateError, setUpdateError] = useState<string | null>(null);
   const [updateSuccess, setUpdateSuccess] = useState(false);
@@ -53,8 +55,7 @@ export default function ProfilePage({
 
       setCurrentTier(tier as Tier);
       setUpdateSuccess(true);
-
-      // Clear success message after 3 seconds
+      router.refresh();
       setTimeout(() => setUpdateSuccess(false), 3000);
     } catch (error) {
       console.error('Error updating tier:', error);

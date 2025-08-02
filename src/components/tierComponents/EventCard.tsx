@@ -1,19 +1,49 @@
+'use client';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import type { Database as supabaseDB } from '@/types/database';
-import { Calendar, Clock, ExternalLink, Lock, MapPin, Users } from 'lucide-react';
-import Image from 'next/image';
-import TierBadge from './TierBadge';
+import { Card, CardDescription, CardTitle } from '@/components/ui/card';
+import { Calendar, Clock, ExternalLink, Lock, MapPin, Star, Users } from 'lucide-react';
+import { useState } from 'react';
 
-type eventType = supabaseDB['public']['Tables']['events']['Row'];
+// TierBadge component
+const TierBadge = ({ tier }: { tier: 'free' | 'premium' }) => {
+  return (
+    <Badge
+      variant={tier === 'premium' ? 'default' : 'secondary'}
+      className={`
+        text-xs font-medium px-2.5 py-1 rounded-md border-0
+        ${
+          tier === 'premium'
+            ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg shadow-violet-500/25'
+            : 'bg-zinc-700 text-zinc-200 shadow-sm'
+        }
+      `}
+    >
+      {tier === 'premium' && <Star className="h-3 w-3 mr-1" />}
+      {tier.charAt(0).toUpperCase() + tier.slice(1)}
+    </Badge>
+  );
+};
+
+// Simplified type definition for demonstration
+type eventType = {
+  id: string;
+  title: string;
+  description: string;
+  event_date: string;
+  image_url: string | null;
+  tier: 'free' | 'premium';
+};
 
 interface EventCardProps {
   event: eventType;
   accessible: boolean;
 }
 
-export default function EventCard({ event, accessible }: EventCardProps) {
+export default function ProfessionalEventCard({ event, accessible }: EventCardProps) {
+  const [imageError, setImageError] = useState(false);
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return {
@@ -32,111 +62,152 @@ export default function EventCard({ event, accessible }: EventCardProps) {
   };
 
   const { date, time } = formatDate(event.event_date);
+  const isUpcoming = new Date(event.event_date) > new Date();
+  const attendeeCount = Math.floor(Math.random() * 150) + 25;
 
   return (
     <Card
-      className={`group overflow-hidden transition-all duration-300 hover:shadow-xl ${
-        accessible
-          ? 'hover:scale-[1.02] cursor-pointer border-l-4 border-l-blue-500'
-          : 'opacity-75 relative border-l-4 border-l-gray-300'
-      }`}
+      className={`
+        group overflow-hidden transition-all duration-300 
+        bg-zinc-900 border border-zinc-800 shadow-xl shadow-black/20
+        ${
+          accessible
+            ? 'hover:border-zinc-700 hover:shadow-2xl hover:shadow-black/30 cursor-pointer'
+            : 'opacity-90 relative'
+        }
+      `}
     >
       {!accessible && (
-        <div className="absolute inset-0 bg-gradient-to-br from-black/30 to-black/50 z-10 flex items-center justify-center backdrop-blur-[1px]">
-          <div className="bg-white/95 backdrop-blur-sm rounded-xl p-4 text-center shadow-lg border">
-            <Lock className="h-8 w-8 mx-auto mb-3 text-purple-600" />
-            <p className="text-sm font-semibold text-gray-800 mb-1">Premium Event</p>
-            <p className="text-xs text-gray-600">Upgrade to access</p>
+        <div className="absolute inset-0 bg-black/70 z-20 flex items-center justify-center backdrop-blur-sm">
+          <div className="bg-zinc-900/95 backdrop-blur-sm rounded-xl p-6 text-center shadow-2xl border border-zinc-700 max-w-xs mx-4 ring-1 ring-white/10">
+            <div className="h-14 w-14 mx-auto mb-4 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg shadow-violet-500/25">
+              <Lock className="h-7 w-7 text-white" />
+            </div>
+            <h3 className="text-lg font-semibold text-white mb-2">Premium Event</h3>
+            <p className="text-sm text-zinc-400 mb-4 leading-relaxed">
+              Upgrade your membership to access this exclusive content
+            </p>
+            <Button
+              size="sm"
+              className="bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white shadow-lg shadow-violet-500/25 border-0"
+            >
+              Upgrade Now
+            </Button>
           </div>
         </div>
       )}
 
-      {/* Event Image */}
-      <div className="relative h-48 sm:h-52 lg:h-48 overflow-hidden bg-gradient-to-br from-blue-50 to-purple-50">
-        <Image
-          src={event.image_url || '/placeholder.svg?height=200&width=400'}
-          alt={event.title}
-          fill
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        />
-        <div className="absolute top-3 right-3 flex gap-2">
+      {/* Event Image Section */}
+      <div className="relative h-56 overflow-hidden bg-gradient-to-br from-zinc-800 to-zinc-900">
+        {!imageError ? (
+          <img
+            src={
+              event.image_url ||
+              'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&h=300&fit=crop&crop=center'
+            }
+            alt={event.title}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center">
+            <div className="text-center text-zinc-500">
+              <Calendar className="h-12 w-12 mx-auto mb-2 opacity-50" />
+              <p className="text-sm font-medium">Event Image</p>
+            </div>
+          </div>
+        )}
+
+        {/* Badges Overlay */}
+        <div className="absolute top-4 right-4 flex gap-2">
           <TierBadge tier={event.tier} />
-          {accessible && (
-            <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs">
+          {accessible && isUpcoming && (
+            <Badge className="bg-emerald-500/90 hover:bg-emerald-500 text-white text-xs px-2.5 py-1 border-0 shadow-lg shadow-emerald-500/25">
               Available
             </Badge>
           )}
         </div>
+
+        {/* Gradient Overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
       </div>
 
-      <CardHeader className="pb-3 space-y-2">
-        <div className="flex items-start justify-between gap-2">
-          <CardTitle className="text-lg sm:text-xl leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors">
+      {/* Clear Separator Line */}
+      <div className="h-px bg-gradient-to-r from-transparent via-zinc-700 to-transparent"></div>
+
+      {/* Content Section */}
+      <div className="p-6">
+        {/* Header */}
+        <div className="mb-5">
+          <CardTitle className="text-xl font-semibold text-white mb-3 line-clamp-2 leading-tight group-hover:text-zinc-200 transition-colors">
             {event.title}
           </CardTitle>
+          <CardDescription className="text-zinc-400 line-clamp-3 leading-relaxed text-sm">
+            {event.description}
+          </CardDescription>
         </div>
-        <CardDescription className="text-sm text-gray-600 line-clamp-3 leading-relaxed">
-          {event.description}
-        </CardDescription>
-      </CardHeader>
 
-      <CardContent className="pt-0 space-y-4">
-        {/* Event Details */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-3 text-sm text-gray-600">
-            <Calendar className="h-4 w-4 text-blue-500 flex-shrink-0" />
-            <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
-              <span className="font-medium">{date}</span>
-              <span className="text-xs sm:text-sm text-gray-500">{time}</span>
+        {/* Event Details Grid */}
+        <div className="grid grid-cols-1 gap-4 mb-6">
+          <div className="flex items-center gap-3 text-sm">
+            <div className="h-9 w-9 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center flex-shrink-0">
+              <Calendar className="h-4 w-4 text-blue-400" />
+            </div>
+            <div>
+              <span className="font-medium text-white">{date}</span>
+              <span className="text-zinc-400 ml-2">{time}</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 text-sm text-gray-600">
-            <MapPin className="h-4 w-4 text-green-500 flex-shrink-0" />
-            <span className="truncate">Online Workshop</span>
+          <div className="flex items-center gap-3 text-sm">
+            <div className="h-9 w-9 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center flex-shrink-0">
+              <MapPin className="h-4 w-4 text-emerald-400" />
+            </div>
+            <span className="text-zinc-300">Online Workshop</span>
           </div>
 
-          <div className="flex items-center gap-3 text-sm text-gray-600">
-            <Users className="h-4 w-4 text-purple-500 flex-shrink-0" />
-            <span>{Math.floor(Math.random() * 50) + 10} attending</span>
+          <div className="flex items-center gap-3 text-sm">
+            <div className="h-9 w-9 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center flex-shrink-0">
+              <Users className="h-4 w-4 text-violet-400" />
+            </div>
+            <span className="text-zinc-300">{attendeeCount} registered</span>
           </div>
         </div>
 
         {/* Action Button */}
-        <div className="pt-2">
-          <Button
-            className={`w-full transition-all duration-200 ${
+        <Button
+          className={`
+            w-full h-11 font-medium transition-all duration-200 border-0
+            ${
               accessible
-                ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg'
-                : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-            }`}
-            disabled={!accessible}
-            size="sm"
-          >
-            {accessible ? (
-              <>
-                <ExternalLink className="h-4 w-4 mr-2" />
-                Register Now
-              </>
-            ) : (
-              <>
-                <Lock className="h-4 w-4 mr-2" />
-                Upgrade to Access
-              </>
-            )}
-          </Button>
-        </div>
+                ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg shadow-blue-600/25 hover:shadow-blue-600/30'
+                : 'bg-zinc-800 text-zinc-500 cursor-not-allowed hover:bg-zinc-800 border border-zinc-700'
+            }
+          `}
+          disabled={!accessible}
+        >
+          {accessible ? (
+            <>
+              <ExternalLink className="h-4 w-4 mr-2" />
+              {isUpcoming ? 'Register Now' : 'View Recording'}
+            </>
+          ) : (
+            <>
+              <Lock className="h-4 w-4 mr-2" />
+              Upgrade Required
+            </>
+          )}
+        </Button>
 
-        {/* Event Status */}
-        <div className="flex items-center justify-between text-xs text-gray-500 pt-2 border-t">
-          <span className="flex items-center gap-1">
+        {/* Footer Status */}
+        <div className="flex items-center justify-between mt-5 pt-4 border-t border-zinc-800">
+          <div className="flex items-center gap-1.5 text-xs text-zinc-500">
             <Clock className="h-3 w-3" />
-            {new Date(event.event_date) > new Date() ? 'Upcoming' : 'Past Event'}
-          </span>
-          <span className="capitalize font-medium">{event.tier} tier</span>
+            <span className="font-medium">{isUpcoming ? 'Upcoming Event' : 'Past Event'}</span>
+          </div>
+          <div className="text-xs text-zinc-500 font-medium capitalize">{event.tier} Tier</div>
         </div>
-      </CardContent>
+      </div>
     </Card>
   );
 }

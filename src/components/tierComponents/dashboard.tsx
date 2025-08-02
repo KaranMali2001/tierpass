@@ -7,21 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import type { Database as supabaseDB } from '@/types/database';
 import { Tier } from '@/types/tier-types';
-import {
-  Activity,
-  Award,
-  BarChart3,
-  Bell,
-  Calendar,
-  Filter,
-  Grid3X3,
-  List,
-  Search,
-  Settings,
-  Target,
-  TrendingUp,
-  User,
-} from 'lucide-react';
+import { Bell, Calendar, Filter, Search, Settings, User } from 'lucide-react';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
@@ -29,7 +15,6 @@ type eventType = supabaseDB['public']['Tables']['events']['Row'];
 
 export default function EventsPage({
   events,
-  totalEvents,
   userTier,
 }: {
   events: eventType[];
@@ -38,7 +23,6 @@ export default function EventsPage({
 }) {
   const [selectedFilter, setSelectedFilter] = useState<Tier>(Tier.all);
   const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   // Client-side filtering of events
   const filteredAndSearchedEvents = useMemo(() => {
@@ -126,133 +110,8 @@ export default function EventsPage({
       </header>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Executive Dashboard Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-          <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-l-blue-600">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-bold text-slate-700 uppercase tracking-wide">
-                Available Events
-              </CardTitle>
-              <div className="p-2 bg-blue-600 rounded-lg">
-                <BarChart3 className="h-4 w-4 text-white" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-slate-900 mb-1">{events.length}</div>
-              <p className="text-sm text-slate-600 font-medium">Events accessible to you</p>
-              <div className="mt-3 flex items-center text-xs text-blue-700 font-semibold">
-                <TrendingUp className="h-3 w-3 mr-1" />
-                Current access
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-50 to-purple-100 border-l-4 border-l-purple-600">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-bold text-slate-700 uppercase tracking-wide">
-                Premium Events
-              </CardTitle>
-              <div className="p-2 bg-purple-600 rounded-lg">
-                <Award className="h-4 w-4 text-white" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-slate-900 mb-1">
-                {totalEvents - events.length}
-              </div>
-              <p className="text-sm text-slate-600 font-medium">Requires tier upgrade</p>
-              <div className="mt-3 flex items-center text-xs text-purple-700 font-semibold">
-                <Target className="h-3 w-3 mr-1" />
-                Upgrade benefits
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-0 shadow-lg bg-gradient-to-br from-emerald-50 to-emerald-100 border-l-4 border-l-emerald-600">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-bold text-slate-700 uppercase tracking-wide">
-                Active Results
-              </CardTitle>
-              <div className="p-2 bg-emerald-600 rounded-lg">
-                <Activity className="h-4 w-4 text-white" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-slate-900 mb-1">
-                {filteredAndSearchedEvents.length}
-              </div>
-              <p className="text-sm text-slate-600 font-medium">Currently displayed</p>
-              <div className="mt-3 flex items-center text-xs text-emerald-700 font-semibold">
-                <Filter className="h-3 w-3 mr-1" />
-                Filtered view
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-0 shadow-lg bg-gradient-to-br from-amber-50 to-amber-100 border-l-4 border-l-amber-600">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-bold text-slate-700 uppercase tracking-wide">
-                Access Tier
-              </CardTitle>
-              <div className="p-2 bg-amber-600 rounded-lg">
-                <Target className="h-4 w-4 text-white" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-slate-900 mb-1">
-                {userTier === 'free'
-                  ? 'Level 1'
-                  : userTier === 'silver'
-                  ? 'Level 2'
-                  : userTier === 'gold'
-                  ? 'Level 3'
-                  : 'Level 4'}
-              </div>
-              <p className="text-sm text-slate-600 font-medium capitalize">{userTier} membership</p>
-              <div className="mt-3 flex items-center text-xs text-amber-700 font-semibold">
-                <Award className="h-3 w-3 mr-1" />
-                Current status
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
         {/* Advanced Search & Filter Panel */}
         <Card className="mb-8 border-0 shadow-lg">
-          <CardHeader className="bg-slate-50 border-b border-slate-200">
-            <CardTitle className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-slate-900 rounded-lg">
-                  <Search className="h-5 w-5 text-white" />
-                </div>
-                <span className="text-xl font-bold text-slate-900">Search & Discovery</span>
-              </div>
-
-              {/* View Mode Toggle */}
-              <div className="flex items-center gap-2 bg-white rounded-lg border border-slate-200 p-1">
-                <Button
-                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('grid')}
-                  className={`px-3 ${
-                    viewMode === 'grid' ? 'bg-slate-900 text-white' : 'text-slate-600'
-                  }`}
-                >
-                  <Grid3X3 className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={viewMode === 'list' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('list')}
-                  className={`px-3 ${
-                    viewMode === 'list' ? 'bg-slate-900 text-white' : 'text-slate-600'
-                  }`}
-                >
-                  <List className="h-4 w-4" />
-                </Button>
-              </div>
-            </CardTitle>
-          </CardHeader>
           <CardContent className="space-y-6 pt-6">
             {/* Enhanced Search Bar */}
             <div className="relative">
@@ -310,12 +169,6 @@ export default function EventsPage({
             {/* Search Results Summary */}
             {(searchQuery || selectedFilter !== 'all') && (
               <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
-                <div className="flex items-center gap-2 text-slate-700">
-                  <span className="font-semibold">
-                    {filteredAndSearchedEvents.length} of {events.length} events
-                  </span>
-                  <span className="text-slate-500">match your criteria</span>
-                </div>
                 <div className="flex gap-2">
                   {searchQuery && (
                     <Button variant="outline" size="sm" onClick={() => setSearchQuery('')}>
@@ -386,14 +239,9 @@ export default function EventsPage({
                 )}
               </div>
             ) : (
-              <div
-                className={`${
-                  viewMode === 'grid'
-                    ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8'
-                    : 'space-y-4'
-                }`}
-              >
+              <div className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8`}>
                 {filteredAndSearchedEvents.map((event) => (
+                  //@ts-ignore
                   <EventCard key={event.id} event={event} accessible={true} />
                 ))}
               </div>

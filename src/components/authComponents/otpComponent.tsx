@@ -48,7 +48,6 @@ export function OtpComponent({ strategy }: { strategy: string }) {
         }
       }
     } catch (err) {
-      console.error('error is', err);
       //@ts-expect-error err.errors is not defined
       setError(err.errors?.[0]?.message || 'OTP verification failed');
     } finally {

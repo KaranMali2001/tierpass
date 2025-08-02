@@ -14,9 +14,6 @@ export async function POST(req: NextRequest) {
       const userEvent = evt as unknown as ClerkUserCreatedEvent; // Safe cast after narrowing
       const { id } = userEvent.data;
 
-      console.log(`New user created: ${id}`);
-      console.log('Webhook payload:', userEvent.data);
-
       const { data, error } = await supabase.from('users').insert({
         clerk_id: id,
         email: userEvent.data.email_addresses[0].email_address,
